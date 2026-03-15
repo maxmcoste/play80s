@@ -415,7 +415,11 @@ function showOptionsAndStartTimer() {
 // ── Answer Selection ──────────────────────────────────────────────────────────
 
 function selectAnswer(index) {
-  if (state.answered) return;
+  // Accept the click if not yet answered, OR if we are still inside the
+  // grace window (player clicked before the deadline but timeOut fired first)
+  const withinGrace = state.timerDeadline &&
+    (Date.now() - state.timerDeadline) <= TIMER_GRACE_MS;
+  if (state.answered && !withinGrace) return;
   state.answered = true;
   stopTimer();
 
@@ -476,19 +480,29 @@ function timeOut() {
 
 // ── Timer ────────────────────────────────────────────────────────────────────
 
+const TIMER_DURATION = 15;
+const TIMER_GRACE_MS = 300; // window after display hits 0 where clicks still count
+
 function startTimer() {
-  state.timerSeconds = 15;
-  state.timerRunning = true;
+  state.timerSeconds  = TIMER_DURATION;
+  state.timerDeadline = Date.now() + TIMER_DURATION * 1000;
+  state.timerRunning  = true;
   updateTimerDisplay();
 
+  // Poll every 100ms so the display stays accurate regardless of drift
   state.timerInterval = setInterval(() => {
-    state.timerSeconds -= 1;
-    updateTimerDisplay();
+    const remaining = Math.ceil((state.timerDeadline - Date.now()) / 1000);
+    if (remaining !== state.timerSeconds) {
+      state.timerSeconds = remaining;
+      updateTimerDisplay();
+    }
     if (state.timerSeconds <= 0) {
       stopTimer();
-      timeOut();
+      // Grace period: defer timeOut() so any click already in the event
+      // queue (player tapped just before the deadline) is processed first.
+      setTimeout(timeOut, TIMER_GRACE_MS);
     }
-  }, 1000);
+  }, 100);
 }
 
 function stopTimer() {
