@@ -26,6 +26,8 @@ const state = {
   audio: null,
   progressInterval: null,
   answered: false,
+  preloadAudio: null,        // preloaded Audio object
+  preloadForId: null,        // song.id of the preloaded audio
 };
 
 // ── DOM helpers ──────────────────────────────────────────────────────────────
@@ -49,6 +51,26 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// ── Preloading ───────────────────────────────────────────────────────────────
+
+function preloadSong(roundIndex) {
+  if (roundIndex < 0 || roundIndex >= state.totalRounds) return;
+  const song = state.questions[roundIndex];
+  if (!song) return;
+  if (state.preloadForId === song.id) return; // already preloaded
+
+  if (state.preloadAudio) {
+    state.preloadAudio.src = '';
+    state.preloadAudio = null;
+    state.preloadForId = null;
+  }
+
+  const audio = new Audio(`snippets/${song.filename}`);
+  audio.preload = 'auto';
+  state.preloadAudio = audio;
+  state.preloadForId = song.id;
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
@@ -126,6 +148,7 @@ function showTurnScreen() {
     box.classList.toggle('active-player', i === state.currentPlayerIndex);
   });
 
+  preloadSong(state.currentRound);
   showScreen('turn');
 }
 
@@ -181,7 +204,14 @@ function playSnippet() {
   $('vinyl').classList.add('spinning');
   show($('audio-progress-wrap'));
 
-  const audio = new Audio(`snippets/${song.filename}`);
+  let audio;
+  if (state.preloadForId === song.id && state.preloadAudio) {
+    audio = state.preloadAudio;
+    state.preloadAudio = null;
+    state.preloadForId = null;
+  } else {
+    audio = new Audio(`snippets/${song.filename}`);
+  }
   state.audio = audio;
 
   audio.onerror = () => {
@@ -456,6 +486,9 @@ function showResult(isCorrect) {
   $('btn-next').querySelector('span').textContent =
     isLastRound ? 'SEE FINAL SCORES ▶' : 'NEXT ROUND ▶';
 
+  // Preload next song while player reads the result screen
+  preloadSong(state.currentRound + 1);
+
   showScreen('result');
 }
 
@@ -513,6 +546,8 @@ function showFinalScore() {
 
 function resetToWelcome() {
   if (state.audio) { state.audio.pause(); state.audio = null; }
+  if (state.preloadAudio) { state.preloadAudio.src = ''; state.preloadAudio = null; }
+  state.preloadForId = null;
   stopTimer();
   clearInterval(state.progressInterval);
   showScreen('welcome');
