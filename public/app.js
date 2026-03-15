@@ -28,6 +28,7 @@ const state = {
   answered: false,
   preloadAudio: null,        // preloaded Audio object
   preloadForId: null,        // song.id of the preloaded audio
+  doubleActive: false,       // double-down chosen for current turn
 };
 
 // ── DOM helpers ──────────────────────────────────────────────────────────────
@@ -51,6 +52,26 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// ── Double Down ──────────────────────────────────────────────────────────────
+
+function activateDouble() {
+  const p = state.players[state.currentPlayerIndex];
+  if (p.doubleUsed) return;
+
+  const btn = $('btn-double');
+  if (btn.classList.contains('activated')) {
+    // Toggle off
+    btn.classList.remove('activated');
+    btn.querySelector('span').textContent = '⚡ DOUBLE DOWN';
+    state.doubleActive = false;
+  } else {
+    // Toggle on
+    btn.classList.add('activated');
+    btn.querySelector('span').textContent = '⚡ DOUBLE ACTIVE!';
+    state.doubleActive = true;
+  }
 }
 
 // ── Preloading ───────────────────────────────────────────────────────────────
@@ -89,6 +110,7 @@ async function init() {
   // Event listeners
   $('btn-start').addEventListener('click', startGame);
   $('btn-ready').addEventListener('click', startQuestion);
+  $('btn-double').addEventListener('click', activateDouble);
   $('btn-play').addEventListener('click', playSnippet);
   $('btn-replay').addEventListener('click', replaySnippet);
   $('btn-next').addEventListener('click', nextRound);
@@ -106,10 +128,12 @@ function startGame() {
 
   const category = $('category-select').value;
 
-  state.players[0].name  = name1;
-  state.players[0].score = 0;
-  state.players[1].name  = name2;
-  state.players[1].score = 0;
+  state.players[0].name       = name1;
+  state.players[0].score      = 0;
+  state.players[0].doubleUsed = false;
+  state.players[1].name       = name2;
+  state.players[1].score      = 0;
+  state.players[1].doubleUsed = false;
   state.roundsPerPlayer  = rounds;
   state.totalRounds      = rounds * 2;
   state.currentRound     = 0;
@@ -148,6 +172,19 @@ function showTurnScreen() {
     box.classList.toggle('active-player', i === state.currentPlayerIndex);
   });
 
+  // Double-down button: show only if this player hasn't used it yet
+  const doubleBtn = $('btn-double');
+  const p = state.players[state.currentPlayerIndex];
+  if (p.doubleUsed) {
+    doubleBtn.classList.add('used');
+    doubleBtn.disabled = true;
+    doubleBtn.querySelector('span').textContent = '⚡ DOUBLE USED';
+  } else {
+    doubleBtn.classList.remove('used', 'activated');
+    doubleBtn.disabled = false;
+    doubleBtn.querySelector('span').textContent = '⚡ DOUBLE DOWN';
+  }
+
   preloadSong(state.currentRound);
   showScreen('turn');
 }
@@ -161,6 +198,14 @@ function startQuestion() {
   state.audioPlayed = false;
   state.answered    = false;
   stopTimer();
+
+  // Lock in the double-down choice and mark it used
+  if (state.doubleActive) {
+    state.players[state.currentPlayerIndex].doubleUsed = true;
+  }
+  const banner = $('double-active-banner');
+  if (state.doubleActive) banner.classList.remove('hidden');
+  else banner.classList.add('hidden');
 
   const p = state.players[state.currentPlayerIndex];
 
@@ -394,8 +439,10 @@ function selectAnswer(index) {
     }
   });
 
-  // Update score
-  if (isCorrect) {
+  // Update score (double-down: +2 correct, -1 wrong)
+  if (state.doubleActive) {
+    state.players[state.currentPlayerIndex].score += isCorrect ? 2 : -1;
+  } else if (isCorrect) {
     state.players[state.currentPlayerIndex].score += 1;
   }
 
@@ -418,6 +465,11 @@ function timeOut() {
     btn.disabled = true;
     if (options[i] && options[i].correct) btn.classList.add('reveal');
   });
+
+  // Double-down penalty on timeout
+  if (state.doubleActive) {
+    state.players[state.currentPlayerIndex].score -= 1;
+  }
 
   setTimeout(() => showResult(false), 900);
 }
@@ -496,6 +548,7 @@ function showResult(isCorrect) {
 
 function nextRound() {
   state.currentRound++;
+  state.doubleActive = false;
 
   if (state.currentRound >= state.totalRounds) {
     showFinalScore();
