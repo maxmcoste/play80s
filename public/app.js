@@ -606,6 +606,22 @@ function resetToWelcome() {
   showScreen('welcome');
 }
 
+// ── Big Mode ("I'm Old") ──────────────────────────────────────────────────────
+
+function initBigMode() {
+  const isBig = localStorage.getItem('bigMode') === '1';
+  setBigMode(isBig);
+  $('btn-old-mode').addEventListener('click', () => {
+    setBigMode(!document.documentElement.classList.contains('big-mode'));
+  });
+}
+
+function setBigMode(on) {
+  document.documentElement.classList.toggle('big-mode', on);
+  $('old-mode-label').textContent = on ? 'NORMAL' : "I'M OLD";
+  localStorage.setItem('bigMode', on ? '1' : '0');
+}
+
 // ── Boot ─────────────────────────────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => { init(); initBigMode(); });
