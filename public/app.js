@@ -96,18 +96,7 @@ function preloadSong(roundIndex) {
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 
-async function init() {
-  try {
-    const res  = await fetch('songs.json');
-    const data = await res.json();
-    state.songs = data.songs;
-  } catch (e) {
-    console.error('Failed to load songs.json:', e);
-    alert('Could not load songs.json.\nMake sure you are running this from a local HTTP server.\n\n  cd public && python3 -m http.server 8080');
-    return;
-  }
-
-  // Event listeners
+function attachListeners() {
   $('btn-start').addEventListener('click', startGame);
   $('btn-ready').addEventListener('click', startQuestion);
   $('btn-double').addEventListener('click', activateDouble);
@@ -115,6 +104,18 @@ async function init() {
   $('btn-replay').addEventListener('click', replaySnippet);
   $('btn-next').addEventListener('click', nextRound);
   $('btn-play-again').addEventListener('click', resetToWelcome);
+}
+
+async function init() {
+  try {
+    const res  = await fetch('songs.json');
+    const data = await res.json();
+    state.songs = data.songs;
+  } catch (e) {
+    console.error('Failed to load songs.json:', e);
+    alert('Could not load songs.json.\nMake sure you are running this from a local HTTP server.\n\n  cd public && python3 -m http.server 8090');
+    return;
+  }
 
   showScreen('welcome');
 }
@@ -624,4 +625,8 @@ function setBigMode(on) {
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', () => { init(); initBigMode(); });
+document.addEventListener('DOMContentLoaded', () => {
+  attachListeners();
+  initBigMode();
+  init();
+});
