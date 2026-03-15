@@ -26,11 +26,18 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  height: 100%;
+  min-height: 100%;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-hud);
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Prevent tap highlight and double-tap zoom on all interactive elements */
+button, input, select {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 /* ── CRT scanlines overlay ── */
@@ -172,8 +179,8 @@ html, body {
   border-radius: var(--radius);
   color: var(--text);
   font-family: var(--font-hud);
-  font-size: 14px;
-  padding: 10px 14px;
+  font-size: 16px; /* ≥16px prevents iOS auto-zoom on focus */
+  padding: 12px 14px;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -618,7 +625,7 @@ html, body {
   50%       { opacity: 0.4; }
 }
 .timer-bar-bg {
-  width: 200px;
+  width: min(200px, 100%);
   height: 5px;
   background: rgba(255,255,255,0.08);
   border-radius: 3px;
@@ -840,12 +847,112 @@ html.big-mode .btn-old-mode {
   zoom: 1; /* counteract parent zoom — button stays its original size */
 }
 
-/* ── Responsive ── */
-@media (max-width: 480px) {
-  .card { padding: 20px 18px; }
-  .logo-80 { font-size: 48px; }
-  .logo-music { font-size: 24px; }
-  .logo-quiz  { font-size: 32px; }
-  .final-scores { flex-direction: column; align-items: center; }
-  .final-score-box { width: 100%; max-width: 100%; }
+/* ══════════════════════════════════════
+   MOBILE — safe-area & base fixes
+══════════════════════════════════════ */
+.app {
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+}
+
+/* Fixed button: keep above bottom notch */
+.btn-old-mode {
+  bottom: max(16px, env(safe-area-inset-bottom));
+  right:  max(16px, env(safe-area-inset-right));
+}
+
+/* ── ≤600px (most phones) ── */
+@media (max-width: 600px) {
+  .app { padding: 12px; }
+
+  /* Welcome */
+  .logo-wrap { margin-bottom: 20px; }
+  .logo-tagline { font-size: 9px; letter-spacing: 1px; margin-top: 8px; }
+  .card { padding: 20px 16px; }
+  .card-title { font-size: 11px; margin-bottom: 18px; }
+  .input-group { margin-bottom: 14px; }
+
+  /* Turn screen */
+  .turn-content { gap: 14px; }
+  .turn-label { font-size: 10px; }
+
+  /* Score row */
+  .score-row { gap: 10px; }
+  .score-box { padding: 10px 14px; min-width: 90px; }
+  .score-value { font-size: 20px; }
+
+  /* Question header — stack into 2 rows */
+  .question-header {
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    justify-content: space-between;
+    row-gap: 4px;
+  }
+  .q-player-badge { font-size: 10px; }
+
+  /* Audio zone */
+  .audio-zone { gap: 12px; margin-bottom: 14px; }
+  .vinyl { width: 120px; height: 120px; }
+  .vinyl-inner { width: 36px; height: 36px; }
+  .vinyl-label { font-size: 11px; }
+
+  /* Play button */
+  .btn-play { font-size: 11px; padding: 14px 28px; }
+
+  /* Options */
+  .options-title { font-size: 9px; margin-bottom: 10px; }
+  .options-grid { gap: 8px; margin-bottom: 10px; }
+  .option-btn { font-size: 12px; padding: 13px 14px; gap: 10px; }
+  .option-letter { font-size: 10px; }
+  .option-year { font-size: 10px; }
+
+  /* Timer */
+  .timer-display { font-size: 24px; }
+  .timer-bar-bg { width: 100%; }
+
+  /* Result */
+  .result-banner { margin-bottom: 16px; }
+  .result-icon { font-size: 52px; }
+  .result-text { font-size: 18px; }
+  .result-song-info { padding: 14px 16px; margin-bottom: 14px; }
+  .result-song-title { font-size: 12px; }
+  .result-scores { margin-bottom: 14px; }
+
+  /* Final */
+  .final-content { gap: 18px; }
+  .final-title { font-size: 16px; }
+  .winner-icon { font-size: 56px; }
+  .final-scores { flex-direction: column; align-items: stretch; gap: 10px; }
+  .final-score-box { max-width: 100%; padding: 16px; }
+  .final-player-score { font-size: 30px; }
+
+  /* Double down */
+  .btn-double { padding: 10px 18px; width: 100%; }
+  .double-active-banner { font-size: 8px; padding: 6px 10px; }
+
+  /* I'm Old button — slightly smaller on mobile */
+  .btn-old-mode { font-size: 6px; padding: 7px 9px; }
+  .btn-old-mode #old-mode-icon { font-size: 18px; }
+}
+
+/* ── ≤390px (small phones: SE, older Androids) ── */
+@media (max-width: 390px) {
+  .logo-80    { font-size: 36px; }
+  .logo-music { font-size: 18px; letter-spacing: 6px; }
+  .logo-quiz  { font-size: 26px; letter-spacing: 4px; }
+  .card-title { font-size: 10px; letter-spacing: 2px; }
+
+  .vinyl { width: 100px; height: 100px; }
+  .vinyl-inner { width: 30px; height: 30px; }
+
+  .option-btn { font-size: 11px; padding: 12px 12px; }
+  .btn-large  { font-size: 11px; padding: 14px 16px; }
+  .turn-player-name { font-size: 20px; }
+
+  .result-text { font-size: 15px; letter-spacing: 2px; }
+  .result-song-title { font-size: 11px; }
+  .final-player-score { font-size: 26px; }
 }
