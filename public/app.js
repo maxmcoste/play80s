@@ -618,7 +618,7 @@ function initBigMode() {
 
 function setBigMode(on) {
   document.documentElement.classList.toggle('big-mode', on);
-  $('old-mode-label').textContent = on ? 'NORMAL' : "I'M OLD";
+  $('old-mode-label').textContent = on ? 'NORMAL' : 'MAGNIFY';
   localStorage.setItem('bigMode', on ? '1' : '0');
 }
 

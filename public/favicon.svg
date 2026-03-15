@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background -->
+  <circle cx="16" cy="16" r="16" fill="#070714"/>
+
+  <!-- Vinyl record body -->
+  <circle cx="16" cy="16" r="14" fill="#0d0d0d"/>
+
+  <!-- Groove rings -->
+  <circle cx="16" cy="16" r="13" fill="none" stroke="#1c1c1c" stroke-width="0.6"/>
+  <circle cx="16" cy="16" r="11.5" fill="none" stroke="#1c1c1c" stroke-width="0.5"/>
+  <circle cx="16" cy="16" r="10" fill="none" stroke="#222" stroke-width="0.5"/>
+  <circle cx="16" cy="16" r="8.5" fill="none" stroke="#1c1c1c" stroke-width="0.5"/>
+  <circle cx="16" cy="16" r="7" fill="none" stroke="#222" stroke-width="0.5"/>
+
+  <!-- Neon pink glow ring -->
+  <circle cx="16" cy="16" r="14" fill="none" stroke="#ff2d78" stroke-width="0.8" opacity="0.6"/>
+
+  <!-- Center label -->
+  <circle cx="16" cy="16" r="5.5" fill="#ff2d78"/>
+  <circle cx="16" cy="16" r="5.5" fill="none" stroke="#ff6aa0" stroke-width="0.5"/>
+
+  <!-- Center hole -->
+  <circle cx="16" cy="16" r="1.8" fill="#070714"/>
+</svg>
