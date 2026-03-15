@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>80s Music Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="app">
+
+    <!-- ── SCREEN: Welcome ── -->
+    <div id="screen-welcome" class="screen active">
+      <div class="logo-wrap">
+        <div class="logo-subtitle">presents</div>
+        <h1 class="logo">
+          <span class="logo-80">80s</span>
+          <span class="logo-music">MUSIC</span>
+          <span class="logo-quiz">QUIZ</span>
+        </h1>
+        <div class="logo-tagline">Guess the song — 5 seconds to recognise it!</div>
+      </div>
+
+      <div class="card setup-card">
+        <h2 class="card-title">ENTER PLAYERS</h2>
+        <div class="input-group">
+          <label class="input-label">🎸 PLAYER 1</label>
+          <input id="player1-name" class="neon-input" type="text" placeholder="Enter name…" maxlength="20" />
+        </div>
+        <div class="input-group">
+          <label class="input-label">🎹 PLAYER 2</label>
+          <input id="player2-name" class="neon-input" type="text" placeholder="Enter name…" maxlength="20" />
+        </div>
+        <div class="input-group">
+          <label class="input-label">🎶 SONG CATEGORY</label>
+          <select id="category-select" class="neon-input neon-select">
+            <option value="all">🌍 All songs (International + Italian)</option>
+            <option value="italian">🇮🇹 Italian 80s only</option>
+            <option value="international">🎸 International 80s only</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">🎵 ROUNDS (per player)</label>
+          <select id="rounds-select" class="neon-input neon-select">
+            <option value="5">5 rounds each (10 total)</option>
+            <option value="7">7 rounds each (14 total)</option>
+            <option value="10">10 rounds each (20 total)</option>
+          </select>
+        </div>
+        <button id="btn-start" class="btn btn-primary btn-large">
+          <span>▶ START GAME</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── SCREEN: Turn Transition ── -->
+    <div id="screen-turn" class="screen">
+      <div class="turn-content">
+        <div class="turn-label">GET READY!</div>
+        <div id="turn-player-name" class="turn-player-name">Player 1</div>
+        <div class="turn-info">
+          <span id="turn-round-info">Round 1 of 10</span>
+        </div>
+        <div class="score-row" id="turn-scores">
+          <div class="score-box">
+            <span id="turn-p1-name">P1</span>
+            <span id="turn-p1-score" class="score-value">0</span>
+          </div>
+          <div class="score-divider">VS</div>
+          <div class="score-box">
+            <span id="turn-p2-name">P2</span>
+            <span id="turn-p2-score" class="score-value">0</span>
+          </div>
+        </div>
+        <button id="btn-ready" class="btn btn-primary btn-large pulse">
+          <span>🎵 I'M READY!</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── SCREEN: Question ── -->
+    <div id="screen-question" class="screen">
+      <div class="question-header">
+        <div class="q-player-badge">
+          <span id="q-player-icon">🎸</span>
+          <span id="q-player-name">Player 1</span>
+        </div>
+        <div class="q-round-badge">
+          ROUND <span id="q-round-num">1</span>/<span id="q-total-rounds">10</span>
+        </div>
+        <div class="q-score-badge">
+          SCORE: <span id="q-score">0</span>
+        </div>
+      </div>
+
+      <div class="audio-zone">
+        <div id="vinyl" class="vinyl">
+          <div class="vinyl-inner">
+            <div class="vinyl-label">?</div>
+          </div>
+        </div>
+        <button id="btn-play" class="btn btn-play">
+          <span id="btn-play-icon">▶</span>
+          <span id="btn-play-text">PLAY SNIPPET</span>
+        </button>
+        <div id="audio-progress-wrap" class="audio-progress-wrap hidden">
+          <div id="audio-progress-bar" class="audio-progress-bar"></div>
+        </div>
+        <button id="btn-replay" class="btn btn-replay hidden">
+          ↺ REPLAY (once)
+        </button>
+      </div>
+
+      <div id="options-zone" class="options-zone hidden">
+        <div class="options-title">🤔 WHAT SONG IS THIS?</div>
+        <div id="options-grid" class="options-grid">
+          <!-- options injected by JS -->
+        </div>
+        <div id="timer-wrap" class="timer-wrap">
+          <div class="timer-label">TIME LEFT</div>
+          <div id="timer-display" class="timer-display">15</div>
+          <div id="timer-bar-bg" class="timer-bar-bg">
+            <div id="timer-bar" class="timer-bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCREEN: Result ── -->
+    <div id="screen-result" class="screen">
+      <div id="result-banner" class="result-banner">
+        <div id="result-icon" class="result-icon">✓</div>
+        <div id="result-text" class="result-text">CORRECT!</div>
+      </div>
+      <div class="result-song-info">
+        <div class="result-label">THE ANSWER WAS</div>
+        <div id="result-song-title" class="result-song-title">Song Title</div>
+        <div id="result-song-artist" class="result-song-artist">Artist Name</div>
+        <div id="result-song-year" class="result-song-year">1984</div>
+      </div>
+      <div class="score-row result-scores">
+        <div class="score-box" id="result-p1-box">
+          <span id="result-p1-name">P1</span>
+          <span id="result-p1-score" class="score-value">0</span>
+        </div>
+        <div class="score-divider">VS</div>
+        <div class="score-box" id="result-p2-box">
+          <span id="result-p2-name">P2</span>
+          <span id="result-p2-score" class="score-value">0</span>
+        </div>
+      </div>
+      <button id="btn-next" class="btn btn-primary btn-large">
+        <span>NEXT ROUND ▶</span>
+      </button>
+    </div>
+
+    <!-- ── SCREEN: Final Score ── -->
+    <div id="screen-final" class="screen">
+      <div class="final-content">
+        <div class="final-title">GAME OVER</div>
+        <div id="winner-banner" class="winner-banner">
+          <div id="winner-icon" class="winner-icon">🏆</div>
+          <div id="winner-text" class="winner-text">PLAYER 1 WINS!</div>
+        </div>
+        <div class="final-scores">
+          <div class="final-score-box" id="final-p1-box">
+            <div id="final-p1-name" class="final-player-name">Player 1</div>
+            <div id="final-p1-score" class="final-player-score">0</div>
+            <div class="final-score-label">points</div>
+          </div>
+          <div class="final-score-box" id="final-p2-box">
+            <div id="final-p2-name" class="final-player-name">Player 2</div>
+            <div id="final-p2-score" class="final-player-score">0</div>
+            <div class="final-score-label">points</div>
+          </div>
+        </div>
+        <button id="btn-play-again" class="btn btn-primary btn-large">
+          <span>↺ PLAY AGAIN</span>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /.app -->
+
+  <script src="app.js"></script>
+</body>
+</html>
