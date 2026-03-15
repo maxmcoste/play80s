@@ -175,7 +175,6 @@ function showTurnScreen() {
 
   // Double-down button: show only if this player hasn't used it yet
   const doubleBtn = $('btn-double');
-  const p = state.players[state.currentPlayerIndex];
   if (p.doubleUsed) {
     doubleBtn.classList.add('used');
     doubleBtn.disabled = true;
